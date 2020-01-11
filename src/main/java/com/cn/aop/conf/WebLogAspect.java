@@ -25,7 +25,10 @@ public class WebLogAspect {
 
     @Pointcut("execution(public * com.cn.aop.controller.*.*(..))")
     public void webLog(){
-        logger.info("invoke webLog.....");
+    }
+
+    @Pointcut("execution(public * com.cn.aop.test.*.*(..))")
+    public void webLog2(){
     }
 
     @Before("webLog()")
@@ -47,5 +50,26 @@ public class WebLogAspect {
     public void doAfterReturning(Object ret) throws Throwable {
         // 处理完请求，返回内容
         logger.info("RESPONSE : " + ret);
+    }
+
+    @Before("webLog2()")
+    public void doBefore2(JoinPoint joinPoint) throws Throwable {
+        // 接收到请求，记录请求内容
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = attributes.getRequest();
+
+        // 记录下请求内容
+        logger.info("URL2 : " + request.getRequestURL().toString());
+        logger.info("HTTP_METHOD2 : " + request.getMethod());
+        logger.info("IP 2: " + request.getRemoteAddr());
+        logger.info("CLASS_METHOD2 : " + joinPoint.getSignature().getDeclaringTypeName() + "." + joinPoint.getSignature().getName());
+        logger.info("ARGS2 : " + Arrays.toString(joinPoint.getArgs()));
+
+    }
+
+    @AfterReturning(returning = "ret", pointcut = "webLog2()")
+    public void doAfterReturning2(Object ret) throws Throwable {
+        // 处理完请求，返回内容
+        logger.info("RESPONSE2 : " + ret);
     }
 }
